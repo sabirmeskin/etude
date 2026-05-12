@@ -1,14 +1,27 @@
 <?php
 require_once __DIR__ . '/BaseController.php';
 require_once __DIR__ . '/../models/Student.php';
+require_once __DIR__ . '/../models/Note.php';
+require_once __DIR__ . '/../models/Attendance.php';
+require_once __DIR__ . '/../models/ClassModel.php';
 require_once __DIR__ . '/../helpers/upload.php';
 
 class StudentController extends BaseController
 {
+    private string $photoDir;
+
+    public function __construct()
+    {
+        $this->photoDir = __DIR__ . '/../storage/uploads/images';
+    }
+
     public function index()
     {
-        $students = Student::all();
-        $this->render('students/list', ['students' => $students]);
+        $search = $_GET['search'] ?? '';
+        $page = (int) ($_GET['page'] ?? 1);
+        $pager = Student::paginate($page, 5, $search);
+        $students = $pager['data'];
+        $this->render('students/list', ['students' => $students, 'search' => $search, 'pager' => $pager]);
     }
 
     public function create()
@@ -25,8 +38,8 @@ class StudentController extends BaseController
             // Handle photo upload
             if (!empty($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
                 $allowed = ['image/jpeg','image/png','image/webp'];
-                $name = uploadFile($_FILES['photo'], __DIR__ . '/../public/uploads/images', $allowed, 2 * 1024 * 1024);
-                if ($name) $_POST['photo'] = '/uploads/images/' . $name;
+                $name = uploadFile($_FILES['photo'], $this->photoDir, $allowed, 2 * 1024 * 1024);
+                if ($name) $_POST['photo'] = $name;
             }
 
             if (!empty($errors)) {
@@ -34,19 +47,7 @@ class StudentController extends BaseController
                 return;
             }
 
-            $studentId = Student::create($_POST);
-
-            // Handle single document upload on creation (optional)
-            if (!empty($_FILES['doc']) && $_FILES['doc']['error'] === UPLOAD_ERR_OK) {
-                require_once __DIR__ . '/../models/Document.php';
-                $allowed = ['application/pdf','application/msword','application/vnd.openxmlformats-officedocument.wordprocessingml.document','image/jpeg','image/png'];
-                $docName = uploadFile($_FILES['doc'], __DIR__ . '/../public/uploads/docs', $allowed, 10 * 1024 * 1024);
-                if ($docName) {
-                    $path = '/uploads/docs/' . $docName;
-                    Document::create($studentId, $_FILES['doc']['name'], $path);
-                }
-            }
-
+            Student::create($_POST);
             header('Location: /index.php?r=students');
             exit;
         }
@@ -61,21 +62,30 @@ class StudentController extends BaseController
             exit;
         }
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            // Get existing student to preserve all fields
+            $existingStudent = Student::find($id);
+            
+            // Merge existing student data with new POST data
+            $updateData = $existingStudent;
+            
+            // Update only the fields that are in the POST (from the info form or photo form)
+            if (!empty($_POST['nom'])) $updateData['nom'] = $_POST['nom'];
+            if (!empty($_POST['prenom'])) $updateData['prenom'] = $_POST['prenom'];
+            if (!empty($_POST['email'])) $updateData['email'] = $_POST['email'];
+            
             // Handle photo upload
             if (!empty($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
                 $allowed = ['image/jpeg','image/png','image/webp'];
-                $name = uploadFile($_FILES['photo'], __DIR__ . '/../public/uploads/images', $allowed, 2 * 1024 * 1024);
-                if ($name) $_POST['photo'] = '/uploads/images/' . $name;
+                $name = uploadFile($_FILES['photo'], $this->photoDir, $allowed, 2 * 1024 * 1024);
+                if ($name) $updateData['photo'] = $name;
             }
-            Student::update($id, $_POST);
+            
+            Student::update($id, $updateData);
             header('Location: /index.php?r=students');
             exit;
         }
         $student = Student::find($id);
-        // load documents
-        require_once __DIR__ . '/../models/Document.php';
-        $documents = Document::byStudent($id);
-        $this->render('students/edit', ['student' => $student, 'documents' => $documents]);
+        $this->render('students/edit', ['student' => $student]);
     }
 
     public function delete()
@@ -85,25 +95,52 @@ class StudentController extends BaseController
             // delete photo file if present (and safe)
             $student = Student::find($id);
             if (!empty($student['photo'])) {
-                $publicDir = realpath(__DIR__ . '/../public');
-                $filePath = $publicDir . $student['photo'];
-                $uploadsBase = realpath(__DIR__ . '/../public/uploads');
+                $filePath = $this->photoDir . DIRECTORY_SEPARATOR . basename($student['photo']);
+                $uploadsBase = realpath($this->photoDir);
                 $realFile = realpath($filePath);
                 if ($realFile && $uploadsBase && strpos($realFile, $uploadsBase) === 0) {
                     @unlink($realFile);
                 }
             }
 
-            // delete related documents (files + records)
-            require_once __DIR__ . '/../models/Document.php';
-            $docs = Document::byStudent($id);
-            foreach ($docs as $d) {
-                Document::delete($d['id']);
-            }
-
             Student::delete($id);
         }
         header('Location: /index.php?r=students');
         exit;
+    }
+
+    public function show()
+    {
+        $id = $_GET['id'] ?? null;
+        if (!$id) {
+            header('Location: /index.php?r=students');
+            exit;
+        }
+        $student = Student::find($id);
+        if (!$student) {
+            header('Location: /index.php?r=students');
+            exit;
+        }
+
+        // Get student's class
+        $class = null;
+        if (!empty($student['classe_id'])) {
+            $class = ClassModel::find($student['classe_id']);
+        }
+
+        // Get student's grades
+        $notes = Note::byStudent($id);
+
+        // Get attendance statistics
+        $attendanceStats = Attendance::statsForStudent($id);
+        $recentAttendance = Attendance::byStudent($id, 5);
+
+        $this->render('students/show', [
+            'student' => $student,
+            'class' => $class,
+            'notes' => $notes,
+            'attendanceStats' => $attendanceStats,
+            'recentAttendance' => $recentAttendance
+        ]);
     }
 }

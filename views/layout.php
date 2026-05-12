@@ -44,6 +44,9 @@
             <a href="/index.php?r=notes/create" class="nav-link block px-4 py-3 rounded-lg text-white hover:bg-purple-500">
                 <i class="fas fa-file-alt mr-2"></i> Notes
             </a>
+            <a href="/index.php?r=schedules" class="nav-link block px-4 py-3 rounded-lg text-white hover:bg-purple-500">
+                <i class="fas fa-calendar-alt mr-2"></i> Emploi du temps
+            </a>
             <a href="/index.php?r=matieres" class="nav-link block px-4 py-3 rounded-lg text-white hover:bg-purple-500">
                 <i class="fas fa-book mr-2"></i> Matières
             </a>

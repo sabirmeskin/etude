@@ -26,6 +26,12 @@ try {
 }
 
 // Exécuter chaque instruction séparément
+$pdo->exec('CREATE DATABASE IF NOT EXISTS ' . DB_NAME . ' CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+$pdo->exec('USE ' . DB_NAME);
+$pdo->exec('SET FOREIGN_KEY_CHECKS = 0');
+$pdo->exec('DROP TABLE IF EXISTS documents');
+$pdo->exec('SET FOREIGN_KEY_CHECKS = 1');
+
 $stmts = array_filter(array_map('trim', explode(';', $schema)));
 try {
     foreach ($stmts as $sql) {

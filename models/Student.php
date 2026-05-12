@@ -10,6 +10,55 @@ class Student
         return $stmt->fetchAll();
     }
 
+    public static function search($keyword)
+    {
+        $pdo = db();
+        $keyword = '%' . $keyword . '%';
+        $stmt = $pdo->prepare('SELECT * FROM etudiants WHERE nom LIKE ? OR prenom LIKE ? OR email LIKE ? ORDER BY id DESC');
+        $stmt->execute([$keyword, $keyword, $keyword]);
+        return $stmt->fetchAll();
+    }
+
+    public static function paginate($page = 1, $perPage = 10, $keyword = '')
+    {
+        $pdo = db();
+        $page = max(1, (int) $page);
+        $perPage = max(1, (int) $perPage);
+        $offset = ($page - 1) * $perPage;
+
+        $where = '';
+        $params = [];
+        if ($keyword !== '') {
+            $where = 'WHERE nom LIKE ? OR prenom LIKE ? OR email LIKE ?';
+            $like = '%' . $keyword . '%';
+            $params = [$like, $like, $like];
+        }
+
+        $countStmt = $pdo->prepare('SELECT COUNT(*) as total FROM etudiants ' . $where);
+        $countStmt->execute($params);
+        $total = (int) ($countStmt->fetch()['total'] ?? 0);
+
+        $sql = 'SELECT * FROM etudiants ' . $where . ' ORDER BY id DESC LIMIT ' . (int) $perPage . ' OFFSET ' . (int) $offset;
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
+
+        return [
+            'data' => $stmt->fetchAll(),
+            'total' => $total,
+            'pages' => (int) ceil($total / $perPage),
+            'page' => $page,
+            'perPage' => $perPage,
+        ];
+    }
+
+    public static function byClass($classId)
+    {
+        $pdo = db();
+        $stmt = $pdo->prepare('SELECT * FROM etudiants WHERE classe_id = ? ORDER BY nom, prenom');
+        $stmt->execute([$classId]);
+        return $stmt->fetchAll();
+    }
+
     public static function find($id)
     {
         $pdo = db();
@@ -48,5 +97,62 @@ class Student
         $pdo = db();
         $stmt = $pdo->prepare('DELETE FROM etudiants WHERE id = ?');
         return $stmt->execute([$id]);
+    }
+
+    public static function getGradeStats($studentId)
+    {
+        $pdo = db();
+        $stmt = $pdo->prepare('
+            SELECT 
+                m.nom as matiere,
+                COUNT(n.id) as count,
+                AVG(n.note) as moyenne,
+                MAX(n.note) as max_note,
+                MIN(n.note) as min_note
+            FROM notes n
+            LEFT JOIN matieres m ON n.matiere_id = m.id
+            WHERE n.etudiant_id = ?
+            GROUP BY n.matiere_id
+            ORDER BY m.nom
+        ');
+        $stmt->execute([$studentId]);
+        return $stmt->fetchAll();
+    }
+
+    public static function getOverallAverage($studentId)
+    {
+        $pdo = db();
+        $stmt = $pdo->prepare('SELECT AVG(note) as moyenne FROM notes WHERE etudiant_id = ?');
+        $stmt->execute([$studentId]);
+        $result = $stmt->fetch();
+        return round($result['moyenne'] ?? 0, 2);
+    }
+
+    public static function getClassStats($classId)
+    {
+        $pdo = db();
+        $stmt = $pdo->prepare('
+            SELECT 
+                e.id,
+                e.nom,
+                e.prenom,
+                AVG(n.note) as moyenne
+            FROM etudiants e
+            LEFT JOIN notes n ON e.id = n.etudiant_id
+            WHERE e.classe_id = ?
+            GROUP BY e.id
+            ORDER BY (moyenne IS NULL), moyenne DESC, e.nom
+        ');
+        $stmt->execute([$classId]);
+        return $stmt->fetchAll();
+    }
+
+    public static function countByClass($classId)
+    {
+        $pdo = db();
+        $stmt = $pdo->prepare('SELECT COUNT(*) as total FROM etudiants WHERE classe_id = ?');
+        $stmt->execute([$classId]);
+        $row = $stmt->fetch();
+        return (int) ($row['total'] ?? 0);
     }
 }

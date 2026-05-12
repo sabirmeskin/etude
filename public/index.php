@@ -24,7 +24,8 @@ $routeMap = [
     'classes' => 'ClassController',
     'matieres' => 'SubjectController',
     'notes' => 'NoteController',
-    'documents' => 'DocumentController',
+    'schedules' => 'ScheduleController',
+    'media' => 'MediaController',
     'auth' => 'AuthController',
 ];
 

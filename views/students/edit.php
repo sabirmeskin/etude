@@ -34,12 +34,12 @@
     </div>
 </div>
 
-<!-- Photo and Documents -->
+<!-- Photo -->
 <div class="max-w-2xl mx-auto mt-6">
     <div class="bg-white p-6 rounded-lg shadow">
         <h3 class="text-lg font-bold mb-4">Photo</h3>
         <?php if (!empty($student['photo'])): ?>
-            <img src="<?=htmlspecialchars($student['photo'])?>" alt="Photo" class="w-32 h-32 object-cover rounded">
+            <img src="<?=htmlspecialchars(resolvePhotoPath($student['photo']))?>" alt="Photo" class="w-32 h-32 object-cover rounded">
         <?php else: ?>
             <div class="w-32 h-32 bg-gray-100 rounded flex items-center justify-center">Pas de photo</div>
         <?php endif; ?>
@@ -50,25 +50,5 @@
             </label>
             <button class="bg-blue-600 text-white px-4 py-2 rounded">Uploader</button>
         </form>
-
-        <hr class="my-4">
-        <h3 class="text-lg font-bold mb-3">Documents</h3>
-        <form method="post" action="/index.php?r=documents/upload" enctype="multipart/form-data" class="flex gap-3">
-            <input type="hidden" name="student_id" value="<?=$student['id']?>">
-            <input type="file" name="doc" accept="application/pdf,application/msword,image/*" required>
-            <button class="bg-gray-800 text-white px-4 py-2 rounded">Uploader</button>
-        </form>
-
-        <div class="mt-4">
-            <?php if (!empty($documents)): ?>
-                <ul class="list-disc pl-6">
-                    <?php foreach ($documents as $d): ?>
-                        <li><a href="<?=htmlspecialchars($d['path'])?>" target="_blank"><?=htmlspecialchars($d['filename'])?></a> <span class="text-sm text-gray-500">(<?=htmlspecialchars($d['uploaded_at'])?>)</span></li>
-                    <?php endforeach; ?>
-                </ul>
-            <?php else: ?>
-                <p class="text-gray-600">Aucun document</p>
-            <?php endif; ?>
-        </div>
     </div>
 </div>

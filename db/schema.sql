@@ -48,14 +48,26 @@ CREATE TABLE IF NOT EXISTS notes (
   FOREIGN KEY (matiere_id) REFERENCES matieres(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- documents liés aux étudiants
-CREATE TABLE IF NOT EXISTS documents (
+-- emploi du temps (horaires des classes)
+CREATE TABLE IF NOT EXISTS emploi_du_temps (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  classe_id INT NOT NULL,
+  matiere_id INT NOT NULL,
+  jour VARCHAR(20) NOT NULL,
+  heure_debut TIME NOT NULL,
+  heure_fin TIME NOT NULL,
+  FOREIGN KEY (classe_id) REFERENCES classes(id) ON DELETE CASCADE,
+  FOREIGN KEY (matiere_id) REFERENCES matieres(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- présences (attendance)
+CREATE TABLE IF NOT EXISTS presences (
   id INT AUTO_INCREMENT PRIMARY KEY,
   etudiant_id INT NOT NULL,
-  filename VARCHAR(255) NOT NULL,
-  path VARCHAR(255) NOT NULL,
-  uploaded_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (etudiant_id) REFERENCES etudiants(id) ON DELETE CASCADE
+  date DATE NOT NULL,
+  present BOOLEAN DEFAULT TRUE,
+  FOREIGN KEY (etudiant_id) REFERENCES etudiants(id) ON DELETE CASCADE,
+  UNIQUE KEY unique_presence (etudiant_id, date)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 -- Fin du schéma
 

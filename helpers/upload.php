@@ -22,3 +22,13 @@ function uploadFile(array $file, string $targetDir, array $allowedMime = [], int
     }
     return null;
 }
+
+function resolvePhotoPath(?string $photo): ?string
+{
+    if (empty($photo)) {
+        return null;
+    }
+
+    $filename = basename($photo);
+    return '/index.php?r=media/image&file=' . rawurlencode($filename);
+}

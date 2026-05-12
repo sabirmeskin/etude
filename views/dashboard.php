@@ -9,6 +9,11 @@ if (!class_exists('ClassModel')) {
     require_once __DIR__ . '/../models/ClassModel.php';
 }
 $classes = ClassModel::all();
+if (!class_exists('Attendance')) {
+    require_once __DIR__ . '/../models/Attendance.php';
+}
+$today = date('Y-m-d');
+$attendanceSummary = Attendance::summaryForDate($today);
 ?>
 
 <div class="space-y-6">
@@ -19,7 +24,7 @@ $classes = ClassModel::all();
     </div>
 
     <!-- Statistiques -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
         <!-- Card Etudiants -->
         <div class="stat-card bg-white border-l-4 border-blue-600 p-6 rounded shadow">
             <div class="flex justify-between items-start">
@@ -59,6 +64,20 @@ $classes = ClassModel::all();
             </div>
             <a href="/index.php?r=notes/create" class="mt-4 inline-block text-green-600 hover:text-green-800 font-medium transition">
                 Ajouter une note <i class="fas fa-arrow-right ml-1"></i>
+            </a>
+        </div>
+
+        <!-- Card Présences -->
+        <div class="stat-card bg-white border-l-4 border-yellow-600 p-6 rounded shadow">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-gray-600 text-sm font-medium">Présences du jour</p>
+                    <p class="text-4xl font-bold mt-2 text-gray-800"><?= (int)($attendanceSummary['present_count'] ?? 0) ?></p>
+                </div>
+                <i class="fas fa-user-check text-4xl text-yellow-100"></i>
+            </div>
+            <a href="/index.php?r=classes" class="mt-4 inline-block text-yellow-600 hover:text-yellow-800 font-medium transition">
+                Gérer les présences <i class="fas fa-arrow-right ml-1"></i>
             </a>
         </div>
     </div>

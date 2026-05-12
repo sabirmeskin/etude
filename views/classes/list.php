@@ -23,6 +23,7 @@
                     <tr class="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
                         <th class="text-left py-4 px-6 text-gray-700 font-semibold">ID</th>
                         <th class="text-left py-4 px-6 text-gray-700 font-semibold">Nom de la classe</th>
+                        <th class="text-left py-4 px-6 text-gray-700 font-semibold">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -30,6 +31,9 @@
                         <tr class="table-row border-b border-gray-100 hover:bg-green-50 transition">
                             <td class="py-4 px-6 text-gray-800 font-medium"><?=htmlspecialchars($c['id'])?></td>
                             <td class="py-4 px-6 text-gray-800"><?=htmlspecialchars($c['nom'])?></td>
+                            <td class="py-4 px-6 text-gray-800">
+                                <a href="/index.php?r=classes/roster&id=<?=$c['id']?>" class="text-blue-600 hover:text-blue-800 font-medium"><i class="fas fa-eye mr-2"></i>Voir la classe</a>
+                            </td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>

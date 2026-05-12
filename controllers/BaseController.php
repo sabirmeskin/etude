@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/../helpers/upload.php';
+
 class BaseController
 {
     public function render(string $view, array $data = [])

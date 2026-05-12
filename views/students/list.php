@@ -10,6 +10,22 @@
         </a>
     </div>
 
+    <!-- Search Bar -->
+    <div class="bg-white rounded-lg shadow-lg p-4">
+        <form method="get" action="/index.php?r=students" class="flex gap-2">
+            <input type="hidden" name="r" value="students">
+            <input type="text" name="search" placeholder="Rechercher par nom, prénom ou email..." value="<?=htmlspecialchars($search ?? '')?>" class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+                <i class="fas fa-search mr-2"></i> Rechercher
+            </button>
+            <?php if ($search): ?>
+                <a href="/index.php?r=students" class="bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400">
+                    <i class="fas fa-times mr-2"></i> Réinitialiser
+                </a>
+            <?php endif; ?>
+        </form>
+    </div>
+
     <!-- Table -->
     <div class="bg-white rounded-lg shadow-lg overflow-hidden">
         <div class="overflow-x-auto">
@@ -32,6 +48,9 @@
                             <td class="py-4 px-6 text-gray-600"><?=htmlspecialchars($s['email'])?></td>
                             <td class="py-4 px-6">
                                 <div class="flex gap-3">
+                                    <a href="/index.php?r=students/show&id=<?=$s['id']?>" class="text-gray-600 hover:text-gray-800 font-medium transition">
+                                        <i class="fas fa-user"></i> Profil
+                                    </a>
                                     <a href="/index.php?r=students/edit&id=<?=$s['id']?>" class="text-blue-600 hover:text-blue-800 font-medium transition">
                                         <i class="fas fa-edit"></i> Modifier
                                     </a>
@@ -49,4 +68,14 @@
             </table>
         </div>
     </div>
+
+    <?php if (!empty($pager['pages']) && $pager['pages'] > 1): ?>
+        <div class="flex justify-center gap-2 flex-wrap">
+            <?php for ($page = 1; $page <= $pager['pages']; $page++): ?>
+                <a href="/index.php?r=students&search=<?=urlencode($search ?? '')?>&page=<?=$page?>" class="px-4 py-2 rounded <?=((int)($pager['page'] ?? 1) === $page) ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 border border-gray-300'?>">
+                    <?=$page?>
+                </a>
+            <?php endfor; ?>
+        </div>
+    <?php endif; ?>
 </div>
