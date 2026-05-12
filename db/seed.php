@@ -20,6 +20,7 @@ $pdo->exec('TRUNCATE TABLE notes');
 $pdo->exec('TRUNCATE TABLE etudiants');
 $pdo->exec('TRUNCATE TABLE matieres');
 $pdo->exec('TRUNCATE TABLE classes');
+$pdo->exec('TRUNCATE TABLE annonces');
 $pdo->exec('TRUNCATE TABLE utilisateurs');
 $pdo->exec('SET FOREIGN_KEY_CHECKS = 1');
 
@@ -47,6 +48,16 @@ foreach ($subjects as [$name, $description]) {
 $adminPassword = password_hash('admin123', PASSWORD_DEFAULT);
 $pdo->prepare('INSERT INTO utilisateurs (nom, email, password, role) VALUES (?, ?, ?, ?)')
     ->execute(['Admin', 'admin@local', $adminPassword, 'admin']);
+
+$announcements = [
+    ['Rentree scolaire', 'Bienvenue a tous les eleves. Bonne rentree!', 'Admin'],
+    ['Examen blanc', 'L examen blanc aura lieu vendredi a 08:00.', 'Admin'],
+    ['Sortie scolaire', 'Sortie prevue la semaine prochaine. Autorisations requises.', 'Admin'],
+];
+$stmt = $pdo->prepare('INSERT INTO annonces (titre, contenu, createur) VALUES (?, ?, ?)');
+foreach ($announcements as [$title, $content, $author]) {
+    $stmt->execute([$title, $content, $author]);
+}
 
 $samplePhotos = [];
 $photoFiles = glob(__DIR__ . '/../storage/uploads/images/*.{png,jpg,jpeg,webp,PNG,JPG,JPEG,WEBP}', GLOB_BRACE) ?: [];

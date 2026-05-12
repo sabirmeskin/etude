@@ -18,6 +18,32 @@
         .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 16px rgba(59, 130, 246, 0.2); }
         .table-row:hover { background-color: #f3f4f6; }
         .stat-card { box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+
+        body.dark { background-color: #0b1220; color: #e5e7eb; }
+        body.dark .bg-white { background-color: #111827; }
+        body.dark .bg-gray-50 { background-color: #0f172a; }
+        body.dark .text-gray-800 { color: #e5e7eb; }
+        body.dark .text-gray-700 { color: #cbd5f5; }
+        body.dark .text-gray-600 { color: #9ca3af; }
+        body.dark .border-gray-200 { border-color: #334155; }
+        body.dark .shadow,
+        body.dark .shadow-lg,
+        body.dark .shadow-sm { box-shadow: 0 1px 3px rgba(0,0,0,0.35); }
+        body.dark .table-row:hover { background-color: #1f2937; }
+        body.dark .stat-card { box-shadow: 0 1px 3px rgba(0,0,0,0.4); }
+        body.dark thead { background-color: #0f172a; }
+        body.dark th { color: #e2e8f0; }
+        body.dark .bg-gray-50 { background-color: #0f172a; }
+        body.dark .bg-gradient-to-r { background-image: none; background-color: #0f172a; }
+        body.dark .from-gray-50,
+        body.dark .to-gray-100 { --tw-gradient-from: #0f172a; --tw-gradient-to: #0f172a; }
+        body.dark #themeToggle { background-color: #1f2937; color: #e5e7eb; }
+        body.dark #themeToggle:hover { background-color: #111827; }
+        body.dark input,
+        body.dark select,
+        body.dark textarea { background-color: #0b1220; color: #e5e7eb; border-color: #334155; }
+        body.dark input::placeholder,
+        body.dark textarea::placeholder { color: #94a3b8; }
     </style>
 
 </head>
@@ -63,8 +89,13 @@
         <div class="bg-white shadow-sm border-b border-gray-200 p-6">
             <div class="flex justify-between items-center">
                 <h1 class="text-3xl font-bold text-gray-800">Mini ERP Scolaire</h1>
-                <div class="text-gray-600">
-                    <i class="fas fa-user-circle mr-2"></i> Admin
+                <div class="flex items-center gap-4">
+                    <button id="themeToggle" class="px-3 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition" type="button">
+                        <i class="fas fa-moon mr-2"></i> Mode sombre
+                    </button>
+                    <div class="text-gray-600">
+                        <i class="fas fa-user-circle mr-2"></i> Admin
+                    </div>
                 </div>
             </div>
         </div>

@@ -14,6 +14,10 @@ if (!class_exists('Attendance')) {
 }
 $today = date('Y-m-d');
 $attendanceSummary = Attendance::summaryForDate($today);
+if (!class_exists('Announcement')) {
+    require_once __DIR__ . '/../models/Announcement.php';
+}
+$announcements = Announcement::latest(5);
 ?>
 
 <div class="space-y-6">
@@ -79,6 +83,50 @@ $attendanceSummary = Attendance::summaryForDate($today);
             <a href="/index.php?r=classes" class="mt-4 inline-block text-yellow-600 hover:text-yellow-800 font-medium transition">
                 Gérer les présences <i class="fas fa-arrow-right ml-1"></i>
             </a>
+        </div>
+    </div>
+
+    <!-- Annonces -->
+    <div class="bg-white p-6 rounded-lg shadow space-y-6">
+        <div class="flex justify-between items-center">
+            <h3 class="text-lg font-bold text-gray-800">Annonces & Actualites</h3>
+        </div>
+
+        <form method="post" action="/index.php?r=announcements/create" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="md:col-span-1">
+                <label class="block text-gray-700 font-semibold mb-2">Titre</label>
+                <input name="titre" type="text" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ex: Reunion parents" required>
+            </div>
+            <div class="md:col-span-2">
+                <label class="block text-gray-700 font-semibold mb-2">Message</label>
+                <input name="contenu" type="text" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Annonce courte..." required>
+            </div>
+            <div class="md:col-span-3 flex justify-end">
+                <button type="submit" class="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition font-semibold">
+                    <i class="fas fa-bullhorn mr-2"></i> Publier
+                </button>
+            </div>
+        </form>
+
+        <div class="divide-y divide-gray-100">
+            <?php if (empty($announcements)): ?>
+                <p class="text-gray-500">Aucune annonce pour le moment.</p>
+            <?php else: ?>
+                <?php foreach ($announcements as $a): ?>
+                    <div class="py-4 flex items-start justify-between gap-4">
+                        <div>
+                            <h4 class="text-gray-800 font-semibold"><?=htmlspecialchars($a['titre'])?></h4>
+                            <p class="text-gray-600 mt-1"><?=htmlspecialchars($a['contenu'])?></p>
+                            <p class="text-xs text-gray-400 mt-2">
+                                Publie le <?=date('d/m/Y H:i', strtotime($a['date_publication']))?> par <?=htmlspecialchars($a['createur'])?>
+                            </p>
+                        </div>
+                        <a href="/index.php?r=announcements/delete&id=<?=$a['id']?>" class="text-red-600 hover:text-red-800 text-sm" onclick="return confirm('Supprimer cette annonce ?')">
+                            <i class="fas fa-trash"></i> Supprimer
+                        </a>
+                    </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
         </div>
     </div>
 

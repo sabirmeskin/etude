@@ -25,6 +25,7 @@ $routeMap = [
     'matieres' => 'SubjectController',
     'notes' => 'NoteController',
     'schedules' => 'ScheduleController',
+    'announcements' => 'AnnouncementController',
     'media' => 'MediaController',
     'auth' => 'AuthController',
 ];

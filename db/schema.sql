@@ -69,6 +69,15 @@ CREATE TABLE IF NOT EXISTS presences (
   FOREIGN KEY (etudiant_id) REFERENCES etudiants(id) ON DELETE CASCADE,
   UNIQUE KEY unique_presence (etudiant_id, date)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- annonces (actualites)
+CREATE TABLE IF NOT EXISTS annonces (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  titre VARCHAR(200) NOT NULL,
+  contenu TEXT NOT NULL,
+  date_publication DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  createur VARCHAR(100) DEFAULT 'Admin'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 -- Fin du schéma
 
 -- Pour créer un utilisateur admin, générer un mot de passe hashé en PHP :
