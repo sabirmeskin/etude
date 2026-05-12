@@ -155,4 +155,65 @@ class Student
         $row = $stmt->fetch();
         return (int) ($row['total'] ?? 0);
     }
+
+    public static function importFromCsv(string $tmpFilePath, array $options = [])
+    {
+        $pdo = db();
+        $handle = fopen($tmpFilePath, 'r');
+        if (!$handle) return ['success' => 0, 'errors' => ['unable_to_open_file']];
+
+        $header = null;
+        $insertStmt = $pdo->prepare('INSERT INTO etudiants (nom, prenom, email, classe_id, photo) VALUES (?, ?, ?, ?, ?)');
+        $success = 0;
+        $errors = [];
+
+        while (($row = fgetcsv($handle, 10000, ',')) !== false) {
+            if ($header === null) {
+                $header = array_map('trim', $row);
+                continue;
+            }
+
+            $data = array_combine($header, $row);
+            if ($data === false) {
+                $errors[] = 'invalid_row';
+                continue;
+            }
+
+            $nom = trim($data['nom'] ?? $data['name'] ?? '');
+            $prenom = trim($data['prenom'] ?? $data['firstname'] ?? '');
+            $email = trim($data['email'] ?? '');
+            $classe = !empty($data['classe_id']) ? (int)$data['classe_id'] : (isset($data['classe']) ? (int)$data['classe'] : null);
+
+            if ($nom === '' || $prenom === '') {
+                $errors[] = 'missing_name';
+                continue;
+            }
+
+            try {
+                $insertStmt->execute([$nom, $prenom, $email ?: null, $classe ?: null, null]);
+                $success++;
+            } catch (Exception $e) {
+                $errors[] = $e->getMessage();
+            }
+        }
+        fclose($handle);
+
+        return ['success' => $success, 'errors' => $errors];
+    }
+
+    public static function exportCsv()
+    {
+        $pdo = db();
+        $stmt = $pdo->query('SELECT id, nom, prenom, email, classe_id FROM etudiants ORDER BY id ASC');
+        $rows = $stmt->fetchAll();
+        $output = fopen('php://memory', 'r+');
+        fputcsv($output, ['id','nom','prenom','email','classe_id']);
+        foreach ($rows as $r) {
+            fputcsv($output, [$r['id'], $r['nom'], $r['prenom'], $r['email'], $r['classe_id']]);
+        }
+        rewind($output);
+        $csv = stream_get_contents($output);
+        fclose($output);
+        return $csv;
+    }
 }

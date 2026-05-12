@@ -5,9 +5,17 @@
             <h2 class="text-2xl font-bold text-gray-800">Gestion des Etudiants</h2>
             <p class="text-gray-600 mt-1">Total: <?= count($students) ?> étudiants</p>
         </div>
-        <a href="/index.php?r=students/create" class="btn-primary bg-blue-600 text-white px-6 py-3 rounded-lg hover:shadow-lg transition hover:bg-blue-700">
-            <i class="fas fa-plus mr-2"></i> Ajouter un étudiant
-        </a>
+        <div class="flex gap-3">
+            <a href="/index.php?r=students/create" class="btn-primary bg-blue-600 text-white px-6 py-3 rounded-lg hover:shadow-lg transition hover:bg-blue-700">
+                <i class="fas fa-plus mr-2"></i> Ajouter un étudiant
+            </a>
+            <a href="/index.php?r=students/import" class="bg-yellow-600 text-white px-4 py-3 rounded-lg hover:bg-yellow-700 transition">
+                <i class="fas fa-file-import mr-2"></i> Import CSV
+            </a>
+            <a href="/index.php?r=students/export" class="bg-gray-200 text-gray-800 px-4 py-3 rounded-lg hover:bg-gray-300 transition">
+                <i class="fas fa-file-csv mr-2"></i> Export CSV
+            </a>
+        </div>
     </div>
 
     <!-- Search Bar -->

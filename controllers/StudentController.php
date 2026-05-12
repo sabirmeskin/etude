@@ -24,6 +24,38 @@ class StudentController extends BaseController
         $this->render('students/list', ['students' => $students, 'search' => $search, 'pager' => $pager]);
     }
 
+    public function import()
+    {
+        $this->render('students/import');
+    }
+
+    public function uploadImport()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || empty($_FILES['csv'])) {
+            header('Location: /index.php?r=students');
+            exit;
+        }
+
+        $tmp = $_FILES['csv']['tmp_name'];
+        $result = Student::importFromCsv($tmp);
+        $message = $result['success'] . ' lignes importées.';
+        if (!empty($result['errors'])) {
+            $message .= ' Erreurs: ' . implode(';', array_slice($result['errors'],0,5));
+        }
+        $_SESSION['flash'] = $message;
+        header('Location: /index.php?r=students');
+        exit;
+    }
+
+    public function export()
+    {
+        $csv = Student::exportCsv();
+        header('Content-Type: text/csv');
+        header('Content-Disposition: attachment; filename="students_export.csv"');
+        echo $csv;
+        exit;
+    }
+
     public function create()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
