@@ -39,6 +39,11 @@ if ($r === 'auth/login' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
+if (empty($_SESSION['user']) && $parts[0] !== 'auth') {
+    header('Location: /index.php?r=auth/login');
+    exit;
+}
+
 try {
     if (!class_exists($controllerName)) {
         if ($parts[0] === 'dashboard') {

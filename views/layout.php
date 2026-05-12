@@ -44,6 +44,14 @@
         body.dark textarea { background-color: #0b1220; color: #e5e7eb; border-color: #334155; }
         body.dark input::placeholder,
         body.dark textarea::placeholder { color: #94a3b8; }
+        body.dark .bg-gray-200 { background-color: #1f2937; }
+        body.dark .bg-gray-300 { background-color: #374151; }
+        body.dark .text-gray-800 { color: #e5e7eb; }
+        body.dark .text-gray-700 { color: #d1d5db; }
+        body.dark a.bg-gray-200,
+        body.dark button.bg-gray-200 { color: #e5e7eb; }
+        body.dark a.bg-gray-300,
+        body.dark button.bg-gray-300 { color: #e5e7eb; }
     </style>
 
 </head>

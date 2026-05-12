@@ -8,6 +8,10 @@ class BaseController
     {
         extract($data);
         $viewFile = __DIR__ . '/../views/' . $view . '.php';
+        if ($view === 'auth/login') {
+            require __DIR__ . '/../views/layout-auth.php';
+            return;
+        }
         require __DIR__ . '/../views/layout.php';
     }
 }
