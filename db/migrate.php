@@ -26,6 +26,16 @@ function tableExists(PDO $pdo, string $table): bool
     return (int) ($stmt->fetch()['c'] ?? 0) > 0;
 }
 
+function uniqueKeyExists(PDO $pdo, string $table, string $keyName): bool
+{
+    $stmt = $pdo->prepare(
+        'SELECT COUNT(*) AS c FROM information_schema.STATISTICS
+         WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND INDEX_NAME = ? AND NON_UNIQUE = 0'
+    );
+    $stmt->execute([$table, $keyName]);
+    return (int) ($stmt->fetch()['c'] ?? 0) > 0;
+}
+
 function run_schema_migrations(PDO $pdo): void
 {
     if (!columnExists($pdo, 'utilisateurs', 'etudiant_id')) {
@@ -92,6 +102,15 @@ function run_schema_migrations(PDO $pdo): void
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4'
         );
         echo "Table password_resets creee.\n";
+    }
+
+    if (!uniqueKeyExists($pdo, 'notes', 'uq_note_etudiant_matiere')) {
+        try {
+            $pdo->exec('ALTER TABLE notes ADD UNIQUE KEY uq_note_etudiant_matiere (etudiant_id, matiere_id)');
+            echo "Index unique uq_note_etudiant_matiere ajoute.\n";
+        } catch (Throwable $e) {
+            // ignore si la structure est deja compatible ou si l'ajout est impossible sur un jeu de donnees existant
+        }
     }
 
     if (!tableExists($pdo, 'professeur_matiere_classe')) {

@@ -44,6 +44,7 @@ CREATE TABLE IF NOT EXISTS notes (
   etudiant_id INT NOT NULL,
   matiere_id INT NOT NULL,
   note DECIMAL(5,2) NOT NULL,
+  UNIQUE KEY uq_note_etudiant_matiere (etudiant_id, matiere_id),
   FOREIGN KEY (etudiant_id) REFERENCES etudiants(id) ON DELETE CASCADE,
   FOREIGN KEY (matiere_id) REFERENCES matieres(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
