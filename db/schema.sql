@@ -78,6 +78,55 @@ CREATE TABLE IF NOT EXISTS annonces (
   date_publication DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   createur VARCHAR(100) DEFAULT 'Admin'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- classes assignees aux professeurs (compte utilisateur role professeur)
+CREATE TABLE IF NOT EXISTS professeur_classe (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  utilisateur_id INT NOT NULL,
+  classe_id INT NOT NULL,
+  UNIQUE KEY uq_prof_classe (utilisateur_id, classe_id),
+  FOREIGN KEY (utilisateur_id) REFERENCES utilisateurs(id) ON DELETE CASCADE,
+  FOREIGN KEY (classe_id) REFERENCES classes(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- devoirs par groupe (classe) et matiere
+CREATE TABLE IF NOT EXISTS devoirs (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  classe_id INT NOT NULL,
+  matiere_id INT NOT NULL,
+  titre VARCHAR(255) NOT NULL,
+  consigne TEXT,
+  date_limite DATE NULL,
+  created_by INT NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (classe_id) REFERENCES classes(id) ON DELETE CASCADE,
+  FOREIGN KEY (matiere_id) REFERENCES matieres(id) ON DELETE CASCADE,
+  FOREIGN KEY (created_by) REFERENCES utilisateurs(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- affectation professeur : matiere + classe (saisie notes / devoirs)
+CREATE TABLE IF NOT EXISTS professeur_matiere_classe (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  utilisateur_id INT NOT NULL,
+  classe_id INT NOT NULL,
+  matiere_id INT NOT NULL,
+  UNIQUE KEY uq_prof_classe_matiere (utilisateur_id, classe_id, matiere_id),
+  FOREIGN KEY (utilisateur_id) REFERENCES utilisateurs(id) ON DELETE CASCADE,
+  FOREIGN KEY (classe_id) REFERENCES classes(id) ON DELETE CASCADE,
+  FOREIGN KEY (matiere_id) REFERENCES matieres(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- jetons reinitialisation mot de passe (lien envoye par email en production)
+CREATE TABLE IF NOT EXISTS password_resets (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  utilisateur_id INT NOT NULL,
+  token_hash CHAR(64) NOT NULL,
+  expires_at DATETIME NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY uq_password_reset_token (token_hash),
+  KEY idx_password_reset_user (utilisateur_id),
+  FOREIGN KEY (utilisateur_id) REFERENCES utilisateurs(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 -- Fin du schéma
 
 -- Pour créer un utilisateur admin, générer un mot de passe hashé en PHP :

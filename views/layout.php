@@ -56,6 +56,10 @@
 
 </head>
 <body class="bg-gray-50">
+<?php
+$role = $currentUser['role'] ?? 'admin';
+$displayName = trim((string) ($currentUser['nom'] ?? '')) ?: ($currentUser['email'] ?? 'Utilisateur');
+?>
 <div class="flex h-screen">
     <!-- Sidebar -->
     <aside class="sidebar w-64 text-white shadow-lg overflow-y-auto">
@@ -69,21 +73,59 @@
             <a href="/index.php?r=dashboard" class="nav-link block px-4 py-3 rounded-lg text-white hover:bg-purple-500">
                 <i class="fas fa-chart-line mr-2"></i> Tableau de bord
             </a>
-            <a href="/index.php?r=students" class="nav-link block px-4 py-3 rounded-lg text-white hover:bg-purple-500">
-                <i class="fas fa-users mr-2"></i> Etudiants
-            </a>
-            <a href="/index.php?r=classes" class="nav-link block px-4 py-3 rounded-lg text-white hover:bg-purple-500">
-                <i class="fas fa-chalkboard mr-2"></i> Classes
-            </a>
-            <a href="/index.php?r=notes/create" class="nav-link block px-4 py-3 rounded-lg text-white hover:bg-purple-500">
-                <i class="fas fa-file-alt mr-2"></i> Notes
-            </a>
-            <a href="/index.php?r=schedules" class="nav-link block px-4 py-3 rounded-lg text-white hover:bg-purple-500">
-                <i class="fas fa-calendar-alt mr-2"></i> Emploi du temps
-            </a>
-            <a href="/index.php?r=matieres" class="nav-link block px-4 py-3 rounded-lg text-white hover:bg-purple-500">
-                <i class="fas fa-book mr-2"></i> Matières
-            </a>
+
+            <?php if ($role === 'etudiant'): ?>
+                <a href="/index.php?r=portal" class="nav-link block px-4 py-3 rounded-lg text-white hover:bg-purple-500">
+                    <i class="fas fa-home mr-2"></i> Mon espace
+                </a>
+                <a href="/index.php?r=portal/schedule" class="nav-link block px-4 py-3 rounded-lg text-white hover:bg-purple-500">
+                    <i class="fas fa-calendar-alt mr-2"></i> Emploi du temps
+                </a>
+                <a href="/index.php?r=portal/notes" class="nav-link block px-4 py-3 rounded-lg text-white hover:bg-purple-500">
+                    <i class="fas fa-file-alt mr-2"></i> Mes notes
+                </a>
+                <a href="/index.php?r=portal/homework" class="nav-link block px-4 py-3 rounded-lg text-white hover:bg-purple-500">
+                    <i class="fas fa-tasks mr-2"></i> Devoirs
+                </a>
+            <?php elseif ($role === 'professeur'): ?>
+                <a href="/index.php?r=notes/bulk" class="nav-link block px-4 py-3 rounded-lg text-white hover:bg-purple-500">
+                    <i class="fas fa-file-alt mr-2"></i> Notes (saisie)
+                </a>
+                <a href="/index.php?r=homework" class="nav-link block px-4 py-3 rounded-lg text-white hover:bg-purple-500">
+                    <i class="fas fa-tasks mr-2"></i> Devoirs
+                </a>
+                <a href="/index.php?r=schedules" class="nav-link block px-4 py-3 rounded-lg text-white hover:bg-purple-500">
+                    <i class="fas fa-calendar-alt mr-2"></i> Emploi du temps
+                </a>
+                <a href="/index.php?r=matieres" class="nav-link block px-4 py-3 rounded-lg text-white hover:bg-purple-500">
+                    <i class="fas fa-book mr-2"></i> Matieres (liste)
+                </a>
+            <?php elseif ($role === 'admin'): ?>
+                <a href="/index.php?r=students" class="nav-link block px-4 py-3 rounded-lg text-white hover:bg-purple-500">
+                    <i class="fas fa-users mr-2"></i> Etudiants
+                </a>
+                <a href="/index.php?r=classes" class="nav-link block px-4 py-3 rounded-lg text-white hover:bg-purple-500">
+                    <i class="fas fa-chalkboard mr-2"></i> Classes
+                </a>
+                <a href="/index.php?r=notes/bulk" class="nav-link block px-4 py-3 rounded-lg text-white hover:bg-purple-500">
+                    <i class="fas fa-file-alt mr-2"></i> Notes
+                </a>
+                <a href="/index.php?r=schedules" class="nav-link block px-4 py-3 rounded-lg text-white hover:bg-purple-500">
+                    <i class="fas fa-calendar-alt mr-2"></i> Emploi du temps
+                </a>
+                <a href="/index.php?r=matieres" class="nav-link block px-4 py-3 rounded-lg text-white hover:bg-purple-500">
+                    <i class="fas fa-book mr-2"></i> Matieres
+                </a>
+                <a href="/index.php?r=homework" class="nav-link block px-4 py-3 rounded-lg text-white hover:bg-purple-500">
+                    <i class="fas fa-tasks mr-2"></i> Devoirs (tous)
+                </a>
+                <a href="/index.php?r=admin/teacherAssignments" class="nav-link block px-4 py-3 rounded-lg text-white hover:bg-purple-500">
+                    <i class="fas fa-user-tie mr-2"></i> Prof. matiere / classe
+                </a>
+            <?php else: ?>
+                <p class="text-xs text-purple-200 px-3 py-2">Role de compte non reconnu. Reconnectez-vous ou contactez l administrateur.</p>
+            <?php endif; ?>
+
             <hr class="border-purple-400 my-3">
             <a href="/index.php?r=auth/logout" class="nav-link block px-4 py-3 rounded-lg text-white hover:bg-red-500">
                 <i class="fas fa-sign-out-alt mr-2"></i> Déconnexion
@@ -102,7 +144,8 @@
                         <i class="fas fa-moon mr-2"></i> Mode sombre
                     </button>
                     <div class="text-gray-600">
-                        <i class="fas fa-user-circle mr-2"></i> Admin
+                        <i class="fas fa-user-circle mr-2"></i> <?=htmlspecialchars($displayName)?>
+                        <span class="text-xs text-gray-400 ml-2">(<?=htmlspecialchars($role)?>)</span>
                     </div>
                 </div>
             </div>

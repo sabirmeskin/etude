@@ -13,7 +13,13 @@ try {
     exit(1);
 }
 
+require_once __DIR__ . '/migrate.php';
+run_schema_migrations($pdo);
+
 $pdo->exec('SET FOREIGN_KEY_CHECKS = 0');
+$pdo->exec('TRUNCATE TABLE devoirs');
+$pdo->exec('TRUNCATE TABLE professeur_matiere_classe');
+$pdo->exec('TRUNCATE TABLE professeur_classe');
 $pdo->exec('TRUNCATE TABLE presences');
 $pdo->exec('TRUNCATE TABLE emploi_du_temps');
 $pdo->exec('TRUNCATE TABLE notes');
@@ -21,6 +27,7 @@ $pdo->exec('TRUNCATE TABLE etudiants');
 $pdo->exec('TRUNCATE TABLE matieres');
 $pdo->exec('TRUNCATE TABLE classes');
 $pdo->exec('TRUNCATE TABLE annonces');
+$pdo->exec('TRUNCATE TABLE password_resets');
 $pdo->exec('TRUNCATE TABLE utilisateurs');
 $pdo->exec('SET FOREIGN_KEY_CHECKS = 1');
 
@@ -46,7 +53,7 @@ foreach ($subjects as [$name, $description]) {
 }
 
 $adminPassword = password_hash('admin123', PASSWORD_DEFAULT);
-$pdo->prepare('INSERT INTO utilisateurs (nom, email, password, role) VALUES (?, ?, ?, ?)')
+$pdo->prepare('INSERT INTO utilisateurs (nom, email, password, role, etudiant_id) VALUES (?, ?, ?, ?, NULL)')
     ->execute(['Admin', 'admin@local', $adminPassword, 'admin']);
 
 $announcements = [
@@ -67,7 +74,7 @@ foreach (array_slice($photoFiles, 0, 3) as $photoFile) {
 }
 
 $students = [
-    ['nom' => 'El Amrani', 'prenom' => 'Youssef', 'email' => 'youssef@example.com', 'classe_id' => $classIds['1ère Année Collège']],
+    ['nom' => 'El Amrani', 'prenom' => 'Youssef', 'email' => 'eleve.demo@scolaire.local', 'classe_id' => $classIds['1ère Année Collège']],
     ['nom' => 'Bennani', 'prenom' => 'Amina', 'email' => 'amina@example.com', 'classe_id' => $classIds['2ème Année Collège']],
     ['nom' => 'Alaoui', 'prenom' => 'Mehdi', 'email' => 'mehdi@example.com', 'classe_id' => $classIds['3ème Année Collège']],
     ['nom' => 'Zerouali', 'prenom' => 'Salma', 'email' => 'salma@example.com', 'classe_id' => $classIds['1ère Année Collège']],

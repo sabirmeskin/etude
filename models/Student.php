@@ -67,6 +67,21 @@ class Student
         return $stmt->fetch();
     }
 
+    /** Recherche insensible a la casse pour lier un compte eleve. */
+    public static function findByEmail(string $email): ?array
+    {
+        $email = strtolower(trim($email));
+        if ($email === '') {
+            return null;
+        }
+        $pdo = db();
+        $stmt = $pdo->prepare('SELECT * FROM etudiants WHERE LOWER(TRIM(email)) = ? LIMIT 1');
+        $stmt->execute([$email]);
+        $row = $stmt->fetch();
+
+        return $row ?: null;
+    }
+
     public static function create(array $data)
     {
         $pdo = db();
@@ -99,11 +114,24 @@ class Student
         return $stmt->execute([$id]);
     }
 
-    public static function getGradeStats($studentId)
+    public static function getGradeStats($studentId, ?array $matiereIdsOnly = null)
     {
         $pdo = db();
+        $extra = '';
+        $params = [$studentId];
+        if ($matiereIdsOnly !== null) {
+            if ($matiereIdsOnly === []) {
+                return [];
+            }
+            $placeholders = implode(',', array_fill(0, count($matiereIdsOnly), '?'));
+            $extra = ' AND n.matiere_id IN (' . $placeholders . ')';
+            foreach ($matiereIdsOnly as $mid) {
+                $params[] = (int) $mid;
+            }
+        }
         $stmt = $pdo->prepare('
             SELECT 
+                m.id AS matiere_id,
                 m.nom as matiere,
                 COUNT(n.id) as count,
                 AVG(n.note) as moyenne,
@@ -111,11 +139,11 @@ class Student
                 MIN(n.note) as min_note
             FROM notes n
             LEFT JOIN matieres m ON n.matiere_id = m.id
-            WHERE n.etudiant_id = ?
-            GROUP BY n.matiere_id
+            WHERE n.etudiant_id = ?' . $extra . '
+            GROUP BY n.matiere_id, m.id, m.nom
             ORDER BY m.nom
         ');
-        $stmt->execute([$studentId]);
+        $stmt->execute($params);
         return $stmt->fetchAll();
     }
 

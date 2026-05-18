@@ -2,13 +2,19 @@
     <div class="bg-white p-6 rounded-lg shadow">
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-2xl font-bold text-gray-800">Emploi du Temps</h2>
+            <?php if (($currentUser['role'] ?? '') === 'admin'): ?>
             <a href="/index.php?r=schedules/create" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
                 <i class="fas fa-plus mr-2"></i> Ajouter un créneaux
             </a>
+            <?php endif; ?>
         </div>
 
         <?php if (empty($schedules)): ?>
-            <p class="text-gray-600 text-center py-8">Aucun créneau d'emploi du temps. <a href="/index.php?r=schedules/create" class="text-blue-600 hover:underline">Créer un</a></p>
+            <p class="text-gray-600 text-center py-8">Aucun créneau d'emploi du temps.
+                <?php if (($currentUser['role'] ?? '') === 'admin'): ?>
+                <a href="/index.php?r=schedules/create" class="text-blue-600 hover:underline">Créer un</a>
+                <?php endif; ?>
+            </p>
         <?php else: ?>
             <div class="overflow-x-auto">
                 <table class="w-full border-collapse border border-gray-300">
@@ -19,7 +25,9 @@
                             <th class="border border-gray-300 p-3 text-left">Jour</th>
                             <th class="border border-gray-300 p-3 text-left">Heure Début</th>
                             <th class="border border-gray-300 p-3 text-left">Heure Fin</th>
+                            <?php if (($currentUser['role'] ?? '') === 'admin'): ?>
                             <th class="border border-gray-300 p-3 text-center">Actions</th>
+                            <?php endif; ?>
                         </tr>
                     </thead>
                     <tbody>
@@ -30,10 +38,12 @@
                                 <td class="border border-gray-300 p-3"><?=htmlspecialchars($schedule['jour'])?></td>
                                 <td class="border border-gray-300 p-3"><?=htmlspecialchars($schedule['heure_debut'])?></td>
                                 <td class="border border-gray-300 p-3"><?=htmlspecialchars($schedule['heure_fin'])?></td>
+                                <?php if (($currentUser['role'] ?? '') === 'admin'): ?>
                                 <td class="border border-gray-300 p-3 text-center">
                                     <a href="/index.php?r=schedules/edit&id=<?=$schedule['id']?>" class="text-blue-600 hover:underline mr-2">Modifier</a>
                                     <a href="/index.php?r=schedules/delete&id=<?=$schedule['id']?>" class="text-red-600 hover:underline" onclick="return confirm('Êtes-vous sûr?')">Supprimer</a>
                                 </td>
+                                <?php endif; ?>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>

@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/BaseController.php';
+require_once __DIR__ . '/../helpers/AuthHelper.php';
 require_once __DIR__ . '/../models/Schedule.php';
 
 class ScheduleController extends BaseController
@@ -7,11 +8,18 @@ class ScheduleController extends BaseController
     public function index()
     {
         $schedules = Schedule::all();
+        if (AuthHelper::isProfesseur()) {
+            $allowed = AuthHelper::teacherClassIds();
+            $schedules = array_values(array_filter($schedules, static function ($row) use ($allowed) {
+                return in_array((int) ($row['classe_id'] ?? 0), $allowed, true);
+            }));
+        }
         $this->render('schedules/list', ['schedules' => $schedules]);
     }
 
     public function create()
     {
+        AuthHelper::requireAdmin();
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $errors = [];
             $classe_id = $_POST['classe_id'] ?? null;
@@ -49,6 +57,7 @@ class ScheduleController extends BaseController
 
     public function edit()
     {
+        AuthHelper::requireAdmin();
         $id = $_GET['id'] ?? null;
         if (!$id) {
             header('Location: /index.php?r=schedules');
@@ -71,6 +80,7 @@ class ScheduleController extends BaseController
 
     public function delete()
     {
+        AuthHelper::requireAdmin();
         $id = $_GET['id'] ?? null;
         if ($id) {
             Schedule::delete($id);

@@ -66,7 +66,7 @@ $announcements = Announcement::latest(5);
                 </div>
                 <i class="fas fa-chart-bar text-4xl text-green-100"></i>
             </div>
-            <a href="/index.php?r=notes/create" class="mt-4 inline-block text-green-600 hover:text-green-800 font-medium transition">
+            <a href="/index.php?r=notes/bulk" class="mt-4 inline-block text-green-600 hover:text-green-800 font-medium transition">
                 Ajouter une note <i class="fas fa-arrow-right ml-1"></i>
             </a>
         </div>

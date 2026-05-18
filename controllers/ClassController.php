@@ -1,11 +1,17 @@
 <?php
 require_once __DIR__ . '/BaseController.php';
+require_once __DIR__ . '/../helpers/AuthHelper.php';
 require_once __DIR__ . '/../models/ClassModel.php';
 require_once __DIR__ . '/../models/Student.php';
 require_once __DIR__ . '/../models/Attendance.php';
 
 class ClassController extends BaseController
 {
+    public function __construct()
+    {
+        AuthHelper::requireAdmin();
+    }
+
     public function index()
     {
         $classes = ClassModel::all();

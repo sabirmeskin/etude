@@ -1,11 +1,13 @@
 <?php
 require_once __DIR__ . '/BaseController.php';
+require_once __DIR__ . '/../helpers/AuthHelper.php';
 require_once __DIR__ . '/../models/Announcement.php';
 
 class AnnouncementController extends BaseController
 {
     public function create()
     {
+        AuthHelper::requireAdmin();
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             header('Location: /index.php?r=dashboard');
             exit;
@@ -28,6 +30,7 @@ class AnnouncementController extends BaseController
 
     public function delete()
     {
+        AuthHelper::requireAdmin();
         $id = $_GET['id'] ?? null;
         if ($id) {
             Announcement::delete($id);

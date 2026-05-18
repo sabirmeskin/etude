@@ -32,7 +32,7 @@ class Note
         return $stmt->fetchAll();
     }
 
-    public static function paginateByStudent($studentId, $page = 1, $perPage = 5, $keyword = '')
+    public static function paginateByStudent($studentId, $page = 1, $perPage = 5, $keyword = '', ?array $matiereIdsOnly = null)
     {
         $pdo = db();
         $page = max(1, (int) $page);
@@ -45,6 +45,22 @@ class Note
         if ($keyword !== '') {
             $where .= ' AND matieres.nom LIKE ?';
             $params[] = '%' . $keyword . '%';
+        }
+        if ($matiereIdsOnly !== null) {
+            if ($matiereIdsOnly === []) {
+                return [
+                    'data' => [],
+                    'total' => 0,
+                    'pages' => 1,
+                    'page' => $page,
+                    'perPage' => $perPage,
+                ];
+            }
+            $placeholders = implode(',', array_fill(0, count($matiereIdsOnly), '?'));
+            $where .= ' AND notes.matiere_id IN (' . $placeholders . ')';
+            foreach ($matiereIdsOnly as $mid) {
+                $params[] = (int) $mid;
+            }
         }
 
         $countSql = 'SELECT COUNT(*) as total FROM notes JOIN matieres ON notes.matiere_id = matieres.id ' . $where;
@@ -65,11 +81,23 @@ class Note
         ];
     }
 
-    public static function average($studentId)
+    public static function average($studentId, ?array $matiereIdsOnly = null)
     {
         $pdo = db();
-        $stmt = $pdo->prepare('SELECT AVG(note) as avg_note FROM notes WHERE etudiant_id = ?');
-        $stmt->execute([$studentId]);
+        $where = 'WHERE etudiant_id = ?';
+        $params = [$studentId];
+        if ($matiereIdsOnly !== null) {
+            if ($matiereIdsOnly === []) {
+                return null;
+            }
+            $placeholders = implode(',', array_fill(0, count($matiereIdsOnly), '?'));
+            $where .= ' AND matiere_id IN (' . $placeholders . ')';
+            foreach ($matiereIdsOnly as $mid) {
+                $params[] = (int) $mid;
+            }
+        }
+        $stmt = $pdo->prepare('SELECT AVG(note) as avg_note FROM notes ' . $where);
+        $stmt->execute($params);
         $row = $stmt->fetch();
         return $row && $row['avg_note'] !== null ? round($row['avg_note'], 2) : null;
     }
