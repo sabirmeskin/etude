@@ -4,7 +4,7 @@
 define('DB_HOST', '127.0.0.1');
 define('DB_NAME', 'mini_erp');
 define('DB_USER', 'root');
-define('DB_PASS', '');
+define('DB_PASS', 'root');
 
 // Sans envoi d email (SMTP) : afficher le lien de reinitialisation sur la page apres la demande. Mettre false en production.
 if (!defined('PASSWORD_RESET_SHOW_LINK')) {
