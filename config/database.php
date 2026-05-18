@@ -4,7 +4,12 @@
 define('DB_HOST', '127.0.0.1');
 define('DB_NAME', 'mini_erp');
 define('DB_USER', 'root');
-define('DB_PASS', 'root');
+define('DB_PASS', '');
+
+// Sans envoi d email (SMTP) : afficher le lien de reinitialisation sur la page apres la demande. Mettre false en production.
+if (!defined('PASSWORD_RESET_SHOW_LINK')) {
+    define('PASSWORD_RESET_SHOW_LINK', true);
+}
 
 function db(): PDO
 {

@@ -38,6 +38,9 @@ try {
         if ($sql === '') continue;
         $pdo->exec($sql);
     }
+    require_once __DIR__ . '/migrate.php';
+    run_schema_migrations($pdo);
+
     echo "Schéma importé avec succès.\n";
     exit(0);
 } catch (Exception $e) {

@@ -5,7 +5,7 @@
             <h2 class="text-2xl font-bold text-gray-800">Notes de <?=htmlspecialchars($student['nom'].' '.$student['prenom'])?></h2>
             <p class="text-gray-600 mt-1">Moyenne générale: <span class="text-2xl font-bold text-purple-600"><?= $avg ?? 'N/A' ?>/20</span></p>
         </div>
-        <a href="/index.php?r=notes/create" class="btn-primary bg-blue-600 text-white px-6 py-3 rounded-lg hover:shadow-lg transition hover:bg-blue-700">
+        <a href="/index.php?r=notes/bulk" class="btn-primary bg-blue-600 text-white px-6 py-3 rounded-lg hover:shadow-lg transition hover:bg-blue-700">
             <i class="fas fa-plus mr-2"></i> Ajouter une note
         </a>
     </div>

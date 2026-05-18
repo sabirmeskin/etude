@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/BaseController.php';
+require_once __DIR__ . '/../helpers/AuthHelper.php';
 require_once __DIR__ . '/../models/Student.php';
 require_once __DIR__ . '/../models/Note.php';
 require_once __DIR__ . '/../models/Attendance.php';
@@ -12,6 +13,7 @@ class StudentController extends BaseController
 
     public function __construct()
     {
+        AuthHelper::requireAdmin();
         $this->photoDir = __DIR__ . '/../storage/uploads/images';
     }
 
